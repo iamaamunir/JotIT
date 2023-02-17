@@ -1,6 +1,7 @@
 const express = require("express");
 const morgan = require("morgan");
 const CONFIG = require("./config/config");
+const userRouter = require("./routes/userRoutes");
 
 const app = express();
 
@@ -19,5 +20,7 @@ app.get("/", (req, res) => {
     message: "Welcome to JotIT Homepage",
   });
 });
+
+app.use("/api/v1/users", userRouter);
 
 module.exports = app;
