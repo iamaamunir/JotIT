@@ -1,6 +1,7 @@
 const User = require("../models/userModel");
 const jwt = require("jsonwebtoken");
 const { omit } = require("lodash");
+// const bcrypt = require("bcrypt");
 const CONFIG = require("../config/config");
 
 exports.signup = async function (req, res) {
@@ -27,23 +28,41 @@ exports.signup = async function (req, res) {
     // Create user in our database
     const user = await User.create({
       name,
-      email, // sanitize: convert email to lowercase
-      //   password: encryptedPassword,
+      email,
       password,
       passwordConfirm,
     });
-
-    // Create token
-    const token = jwt.sign({ user_id: user._id, email }, CONFIG.TOKEN_KEY, {
-      expiresIn: "2h",
-    });
-    // save user token
-    user.token = token;
-
-    // return new user
     res
       .status(201)
       .json(omit(user.toObject(), ["password", "passwordConfirm"]));
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+exports.login = async function (req, res) {
+  try {
+    // Get user input
+    const { email, password } = req.body;
+
+    // Validate user input
+    if (!(email && password)) {
+      res.status(400).send("All input is required");
+    }
+    // Validate if user exist in our database
+    const user = await User.findOne({ email: email });
+    
+    const validPassword = await user.comparePassword(password);
+    if (validPassword) {
+      // Create token
+      const token = jwt.sign({ id: user._id, email: email }, CONFIG.TOKEN_KEY, {
+        expiresIn: "2h",
+      });
+      // save user token
+      user.token = token;
+      return res.status(200).json({ token: token });
+    }
+    return res.status(400).send("Invalid Credentials");
   } catch (err) {
     console.log(err);
   }
