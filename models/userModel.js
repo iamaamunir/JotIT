@@ -14,6 +14,12 @@ const userSchema = new mongoose.Schema({
     unique: true,
     lowercase: true,
   },
+  notes: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Notes",
+    },
+  ],
   password: {
     type: String,
     required: [true, "Please fill in your password"],
@@ -48,11 +54,13 @@ userSchema.pre("save", async function (next) {
 });
 
 userSchema.methods.comparePassword = async function (password) {
-  return bcrypt.compare(password, this.password);
+  const user = this;
+  const compare = await bcrypt.compare(password, user.password);
+  return compare;
 };
 
-userSchema.path("passwordConfirm").validate(function (value) {
-  return this.password === value;
-}, "Passwords do not match");
+// userSchema.path("passwordConfirm").validate(function (value) {
+//   return this.password === value;
+// }, "Passwords do not match");
 
-module.exports = mongoose.model("User", userSchema);
+module.exports = mongoose.model("Users", userSchema);
