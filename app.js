@@ -2,6 +2,7 @@ const express = require("express");
 const morgan = require("morgan");
 const CONFIG = require("./config/config");
 const userRouter = require("./routes/userRoutes");
+const noteRouter = require("./routes/noteRoutes");
 
 const app = express();
 
@@ -21,6 +22,7 @@ app.get("/", (req, res) => {
   });
 });
 
-app.use("/api/v1/users", userRouter);
+app.use("/api/v1/user", userRouter);
+app.use("/api/v1/note", noteRouter);
 
 module.exports = app;

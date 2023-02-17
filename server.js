@@ -1,13 +1,16 @@
+const http = require("http");
+
 const app = require("./app");
 
-const CONFIG = require("./config/config");
+const config = require("./config/config");
+
+const PORT = config.PORT || 5000;
 
 const connectToDb = require("./db/dbConnection");
-
 connectToDb();
 
-const port = CONFIG.PORT || 3000;
+const server = http.createServer(app);
 
-const server = app.listen(port, () => {
-  console.log(`App is listening from port ${port}`);
+server.listen(PORT, () => {
+  console.log(`Server is listening at port: ${PORT}`);
 });
