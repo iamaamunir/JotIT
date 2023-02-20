@@ -15,4 +15,5 @@ exports.verifyToken = (req, res, next) => {
   } catch (err) {
     next(err);
   }
+  return next();
 };

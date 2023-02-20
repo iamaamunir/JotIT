@@ -27,15 +27,17 @@ exports.createNote = async function (req, res, next) {
 
 exports.getNotes = async function (req, res, next) {
   try {
-    const currentUserId = req.user.id;
-    const features = new APIFeatures(
-      Note.find({ owner: currentUserId }),
-      req.query
-    )
-      .sort()
-      .paginate();
-    // const notes = await Note.find()
-    const notes = await features.query;
+    console.log(req);
+    // const currentUserId = req.user.id;
+    // console.log(currentUserId);
+    // const features = new APIFeatures(
+    //   Note.find({ owner: currentUserId }),
+    //   req.query
+    // )
+    //   .sort()
+    //   .paginate();
+    const notes = await Note.find({ owner: req.user.id });
+    // const notes = await features.query;
 
     if (!notes) {
       return next(new AppError("Note Not Found", 404));
@@ -102,6 +104,7 @@ exports.updateNote = async function (req, res, next) {
 exports.deleteNote = async function (req, res, next) {
   try {
     const id = req.params.id;
+
     const note = await Note.findByIdAndDelete(id);
     if (!note) {
       return next(new AppError("Note Not Found", 404));
