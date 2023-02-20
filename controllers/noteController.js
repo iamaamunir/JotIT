@@ -28,16 +28,16 @@ exports.createNote = async function (req, res, next) {
 exports.getNotes = async function (req, res, next) {
   try {
     console.log(req);
-    // const currentUserId = req.user.id;
-    // console.log(currentUserId);
-    // const features = new APIFeatures(
-    //   Note.find({ owner: currentUserId }),
-    //   req.query
-    // )
-    //   .sort()
-    //   .paginate();
-    const notes = await Note.find({ owner: req.user.id });
-    // const notes = await features.query;
+    const currentUserId = req.user.id;
+    console.log(currentUserId);
+    const features = new APIFeatures(
+      Note.find({ owner: currentUserId }),
+      req.query
+    )
+      .sort()
+      .paginate();
+
+    const notes = await features.query;
 
     if (!notes) {
       return next(new AppError("Note Not Found", 404));
