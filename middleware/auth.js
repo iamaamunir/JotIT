@@ -1,18 +1,18 @@
 const jwt = require("jsonwebtoken");
 
 const CONFIG = require("../config/config");
+const AppError = require("../utils/appError");
 
 exports.verifyToken = (req, res, next) => {
-  const token = req.headers.authorization.split(" ")[1];
-
-  if (!token) {
-    return res.status(403).send("A token is required for authentication");
-  }
   try {
+    if (req.headers.authorization === undefined) {
+      next(new AppError("Something is wrong with the server", 500));
+    }
+    const token = req.headers.authorization.split(" ")[1];
+
     const decoded = jwt.verify(token, CONFIG.TOKEN_KEY);
     req.user = decoded;
   } catch (err) {
-    return res.status(401).send("Invalid Token");
+    next(err);
   }
-  return next();
 };

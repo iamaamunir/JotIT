@@ -59,8 +59,4 @@ userSchema.methods.comparePassword = async function (password) {
   return compare;
 };
 
-// userSchema.path("passwordConfirm").validate(function (value) {
-//   return this.password === value;
-// }, "Passwords do not match");
-
 module.exports = mongoose.model("Users", userSchema);

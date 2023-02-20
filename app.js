@@ -3,6 +3,8 @@ const morgan = require("morgan");
 const CONFIG = require("./config/config");
 const userRouter = require("./routes/userRoutes");
 const noteRouter = require("./routes/noteRoutes");
+const errorHandler = require("./middleware/errorHandler");
+const AppError = require("./utils/appError");
 
 const app = express();
 
@@ -24,5 +26,11 @@ app.get("/", (req, res) => {
 
 app.use("/api/v1/user", userRouter);
 app.use("/api/v1/note", noteRouter);
+
+app.all("*", (req, res, next) => {
+  next(new AppError(`Can't find ${req.originalUrl} on this server`, 404));
+});
+
+app.use(errorHandler.errorHandler);
 
 module.exports = app;

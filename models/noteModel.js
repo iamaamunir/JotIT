@@ -2,10 +2,10 @@ const mongoose = require("mongoose");
 
 const noteSchema = new mongoose.Schema({
   title: {
-    type: String
+    type: String,
   },
   content: {
-    type: String
+    type: String,
   },
   createdAt: {
     type: Date,
@@ -14,12 +14,10 @@ const noteSchema = new mongoose.Schema({
   updatedAt: {
     type: Date,
   },
-  owner: [
-    {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Users",
-    },
-  ],
+  owner: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Users",
+  },
 });
 
 module.exports = mongoose.model("Notes", noteSchema);
