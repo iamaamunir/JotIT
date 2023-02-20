@@ -1,6 +1,8 @@
 const Note = require("../models/noteModel");
 const User = require("../models/userModel");
-exports.createNote = async function (req, res) {
+const AppError = require("../utils/appError");
+const APIFeatures = require("../utils/apiFeatures");
+exports.createNote = async function (req, res, next) {
   try {
     const user = await User.findById(req.user.id);
     const { title, content } = req.body;
@@ -19,17 +21,96 @@ exports.createNote = async function (req, res) {
       data: { note },
     });
   } catch (err) {
-    console.log(err);
+    next(err);
   }
 };
 
-exports.getNote = async function (req, res) {
+exports.getNotes = async function (req, res, next) {
   try {
-    res.status(201).json({
+    const currentUserId = req.user.id;
+    const features = new APIFeatures(
+      Note.find({ owner: currentUserId }),
+      req.query
+    )
+      .sort()
+      .paginate();
+    // const notes = await Note.find()
+    const notes = await features.query;
+
+    if (!notes) {
+      return next(new AppError("Note Not Found", 404));
+    }
+
+    res.status(200).json({
       status: "success",
-      data: "not ready...",
+      results: notes.length,
+      data: {
+        notes,
+      },
     });
   } catch (err) {
-    console.log(err);
+    next(err);
+  }
+};
+
+exports.getSingleNote = async function (req, res, next) {
+  try {
+    const id = req.params.id;
+    const currentUserId = req.user.id;
+    const note = await Note.findOne({ _id: id, owner: currentUserId }).populate(
+      "owner",
+      "name"
+    );
+
+    if (!note) {
+      return next(new AppError("Note Not Found", 404));
+    }
+    return res.status(200).json({
+      status: "success",
+      data: {
+        note,
+      },
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.updateNote = async function (req, res, next) {
+  try {
+    const body = req.body;
+    const id = req.params.id;
+    const note = await Note.findByIdAndUpdate(id, body, {
+      new: true,
+      runValidators: true,
+    });
+
+    if (!note) {
+      return next(new AppError("Note Not Found", 404));
+    }
+    note.updatedAt = Date.now();
+    note.save();
+    return res.status(204).json({
+      status: "success",
+      message: "Update Successfull",
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.deleteNote = async function (req, res, next) {
+  try {
+    const id = req.params.id;
+    const note = await Note.findByIdAndDelete(id);
+    if (!note) {
+      return next(new AppError("Note Not Found", 404));
+    }
+    return res.status(204).json({
+      status: "success",
+      message: "Deleted Successfully",
+    });
+  } catch (err) {
+    next(err);
   }
 };

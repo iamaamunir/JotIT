@@ -3,15 +3,17 @@ const jwt = require("jsonwebtoken");
 const { omit } = require("lodash");
 // const bcrypt = require("bcrypt");
 const CONFIG = require("../config/config");
+const AppError = require("../utils/appError");
 
-exports.signup = async function (req, res) {
+exports.signup = async function (req, res, next) {
   try {
     // Get user input
     const { name, email, password, passwordConfirm } = req.body;
 
     // Validate user input
     if (!(email && password && name && passwordConfirm)) {
-      res.status(400).send("All input is required");
+      next(new AppError("All input is required", 400));
+      // res.status(400).json({status:'fail',message:"All input is required"});
     }
 
     // check if user already exist
@@ -19,13 +21,9 @@ exports.signup = async function (req, res) {
     const oldUser = await User.findOne({ email: email });
 
     if (oldUser) {
-      return res.status(409).send("User Already Exist. Please Login");
+      next(new AppError("User Already Exist. Please Login", 409));
     }
 
-    //Encrypt user password
-    // encryptedPassword = await bcrypt.hash(password, 10);
-
-    // Create user in our database
     const user = await User.create({
       name,
       email,
@@ -34,24 +32,25 @@ exports.signup = async function (req, res) {
     });
     res
       .status(201)
+      // omit the password and password confirm
       .json(omit(user.toObject(), ["password", "passwordConfirm"]));
   } catch (err) {
-    console.log(err);
+    next(err);
   }
 };
 
-exports.login = async function (req, res) {
+exports.login = async function (req, res, next) {
   try {
     // Get user input
     const { email, password } = req.body;
 
     // Validate user input
     if (!(email && password)) {
-      res.status(400).send("All input is required");
+      next(new AppError("All input is required", 400));
     }
     // Validate if user exist in our database
     const user = await User.findOne({ email: email });
-    
+
     const validPassword = await user.comparePassword(password);
     if (validPassword) {
       // Create token
@@ -60,10 +59,11 @@ exports.login = async function (req, res) {
       });
       // save user token
       user.token = token;
-      return res.status(200).json({ token: token });
+      res.status(200).json({ token: token });
+    } else {
+      next(new AppError("Invalid credentials", 400));
     }
-    return res.status(400).send("Invalid Credentials");
   } catch (err) {
-    console.log(err);
+    next(err);
   }
 };
