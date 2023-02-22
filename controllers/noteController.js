@@ -27,7 +27,6 @@ exports.createNote = async function (req, res, next) {
 
 exports.getNotes = async function (req, res, next) {
   try {
-    console.log(req);
     const currentUserId = req.user.id;
     console.log(currentUserId);
     const features = new APIFeatures(
