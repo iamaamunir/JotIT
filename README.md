@@ -96,3 +96,10 @@ https://vast-rose-millipede-ring.cyclic.app/
 - Project Link: [JotIt](https://github.com/iamaamunir/JotIT)
 
 <!-- Markdown Links & Images -->
+
+[contributors-shield]: https://img.shields.io/github/contributors/tobisupreme/blogolicious.svg?style=for-the-badge
+[contributors-url]: https://github.com/tobisupreme/blogolicious/graphs/contributors
+[javascript]: https://img.shields.io/badge/javascript-%23323330.svg?style=for-the-badge&logo=javascript&logoColor=%23F7DF1C
+[node]: https://img.shields.io/badge/node.js-6DA55F?style=for-the-badge&logo=node.js&logoColor=white
+[express]: https://img.shields.io/badge/express.js-%23404d59.svg?style=for-the-badge&logo=express&logoColor=%2361DAFB
+[mongodb]: https://img.shields.io/badge/MongoDB-%234ea94b.svg?style=for-the-badge&logo=mongodb&logoColor=white
